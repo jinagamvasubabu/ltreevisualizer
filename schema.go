@@ -1,4 +1,4 @@
-package ltree_visualizer
+package ltreevisualizer
 
 //VisualizerSchema: Contract to send to ltree-visualizer
 type VisualizerSchema struct {

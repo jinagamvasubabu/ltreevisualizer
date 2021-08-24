@@ -1,4 +1,4 @@
-package ltree_visualizer
+package ltreevisualizer
 
 import (
 	"context"

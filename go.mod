@@ -1,4 +1,4 @@
-module ltree-visualizer
+module ltreevisualizer
 
 go 1.16
 

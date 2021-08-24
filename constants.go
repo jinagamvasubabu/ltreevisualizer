@@ -1,4 +1,4 @@
-package ltree_visualizer
+package ltreevisualizer
 
 //GetSupportedRankDir: Supported RankDirs
 func GetSupportedRankDir() []string {

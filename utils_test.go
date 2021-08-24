@@ -1,4 +1,4 @@
-package ltree_visualizer
+package ltreevisualizer
 
 import (
 	"github.com/stretchr/testify/suite"
