@@ -1,6 +1,6 @@
 package ltreevisualizer
 
-//VisualizerSchema: Contract to send to ltree-visualizer
+//VisualizerSchema Contract to send to ltreevisualizer
 type VisualizerSchema struct {
 	Data []data `json:"data"`
 }

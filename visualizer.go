@@ -12,18 +12,19 @@ import (
 	"time"
 )
 
-//IVisualizer
+//IVisualizer interface for to interact ltree visualizer
 type IVisualizer interface {
 	GenerateDotGraph(ctx context.Context, ltreeData VisualizerSchema) (string, error)
 	ConvertLtreeDataToImage(ctx context.Context, ltreeData VisualizerSchema) error
 }
 
-//Visualizer
+//Visualizer config
 type Visualizer struct {
 	LogLevel log.Level
 	RankDir  string
 }
 
+//GenerateDotGraph generates a DOT graph string
 func (v *Visualizer) GenerateDotGraph(ctx context.Context, ltreeData VisualizerSchema) (string, error) {
 	log.SetLevel(v.LogLevel)
 	logger := log.WithContext(ctx).WithFields(log.Fields{"Method": "GenerateDotGraph"})
@@ -44,7 +45,7 @@ func (v *Visualizer) GenerateDotGraph(ctx context.Context, ltreeData VisualizerS
 	//create a map for names to show in the nodes
 	nodeMap := map[string]string{}
 	for _, d := range ltreeData.Data {
-		nodeMap[strconv.Itoa(int(d.Id))] = d.Name
+		nodeMap[strconv.Itoa(int(d.ID))] = d.Name
 	}
 	for _, d := range ltreeData.Data {
 		values := strings.Split(d.Path, ".")
@@ -59,6 +60,7 @@ func (v *Visualizer) GenerateDotGraph(ctx context.Context, ltreeData VisualizerS
 	return g.String(), nil
 }
 
+//ConvertLtreeDataToImage Converts Ltree Data to an image
 func (v *Visualizer) ConvertLtreeDataToImage(ctx context.Context, ltreeData VisualizerSchema) error {
 	log.SetLevel(v.LogLevel)
 	logger := log.WithContext(ctx).WithFields(log.Fields{"Method": "ConvertLtreeDataToImage"})
@@ -72,11 +74,12 @@ func (v *Visualizer) ConvertLtreeDataToImage(ctx context.Context, ltreeData Visu
 	g := graphviz.New()
 	if err := g.RenderFilename(graph, graphviz.PNG, "graph.png"); err != nil {
 		log.Fatal(err)
-		return errors.New(fmt.Sprintf("error while generating image = %s", err.Error()))
+		return fmt.Errorf("error while generating image")
 	}
 	return nil
 }
 
+//validateRequest validate the request
 func (v *Visualizer) validateRequest(ltreeData VisualizerSchema) error {
 	//validations
 	if len(ltreeData.Data) == 0 {
