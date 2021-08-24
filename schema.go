@@ -6,7 +6,7 @@ type VisualizerSchema struct {
 }
 
 type data struct {
-	Id   int32  `json:"id"`
+	ID   int32  `json:"id"`
 	Name string `json:"name"`
 	Path string `json:"path"`
 	Type string `json:"type"`
