@@ -33,7 +33,6 @@ digraph graphname {
     b -> d;
 }
 ```
-Using GraphViz we can visualize it like below:
 ![alt text](https://github.com/jinagamvasubabu/ltreevisualizer/blob/main/images/DotLanguageDirected.png?raw=true)
 
 ## How to use?
