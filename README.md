@@ -1,4 +1,10 @@
 # Ltree Visualizer
+[![Build Status](https://circleci.com/gh/jinagamvasubabu/ltreevisualizer.svg?style=svg)](https://circleci.com/gh/jinagamvasubabu/ltreevisualizer)
+[![Go Report Card](https://goreportcard.com/badge/github.com/jinagamvasubabu/ltreevisualizer)](https://goreportcard.com/report/github.com/jinagamvasubabu/ltreevisualizer)
+[![GoDoc](https://godoc.org/github.com/jinagamvasubabu/ltreevisualizer?status.svg)](https://godoc.org/github.com/jinagamvasubabu/ltreevisualizer) 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Visits Badge](https://badges.pufler.dev/visits/jinagamvasubabu/ltreevisualizer)](https://badges.pufler.dev)
+[![Maintainability](https://api.codeclimate.com/v1/badges/bc775ba7e9b6231175a2/maintainability)](https://codeclimate.com/github/jinagamvasubabu/ltreevisualizer/maintainability)
 A golang library to visualize postgres ltree type data using DOT language and Graphviz
 
 ![alt text](https://github.com/jinagamvasubabu/ltreevisualizer/blob/main/images/LtreeVisualizer.jpg?raw=true)
