@@ -58,7 +58,9 @@ Using GraphViz we can visualize it like below:
   err := l.ConvertLtreeDataToImage(context.Background(), //json data)
 ```
 
-Note: This will create a graph.png image if you don't specify Filepath 
+Note: This will create a graph.png image if you don't specify Filepath
+
+You can refer `examples` directory for more info 
 
 # Config:
 ```go
@@ -69,7 +71,7 @@ type Visualizer struct {
 	FilePath string
 }
 ```
-RankDir: Supported values are
+RankDir: Sets the direction of tree layout(https://www.graphviz.org/docs/attrs/rankdir/) and supported values are
 * TB (Top to Bottom)
 * RL (Right to Left)
 * LR (Left to Right)
@@ -79,7 +81,7 @@ Note: Default is TB
 FilePath: FilePath to save the image, this parameter is optional for `GenerateDotGraph`. 
 Note: Default value of FilePath is `graph.png`
 
-#Input:
+# Input:
 Ltree Visualizer accepts data in this format
 ```go
 //VisualizerSchema Contract to send to ltreevisualizer
