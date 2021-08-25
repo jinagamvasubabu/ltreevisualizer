@@ -1,4 +1,4 @@
-module ltreevisualizer
+module github.com/jinagamvasubabu/ltreevisualizer
 
 go 1.16
 
