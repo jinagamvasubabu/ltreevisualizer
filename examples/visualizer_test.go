@@ -22,9 +22,7 @@ func TestNewVisualizerTestSuite(t *testing.T) {
 }
 
 func (suite *VisualizerTestSuite) SetupTest() {
-	suite.visualizer = ltreevisualizer.Visualizer{
-
-	}
+	suite.visualizer = ltreevisualizer.Visualizer{}
 }
 
 //Example1: This test will generate the Dot Graph and print to the console
@@ -70,11 +68,9 @@ func (suite *VisualizerTestSuite) TestVisualizer_Validation_failure() {
 	suite.NotNil(err)
 }
 
-
 func (suite *VisualizerTestSuite) TestConvertLtreeDataToImage_Validation_Failure() {
 	//Given
 	ltreeData := ltreevisualizer.VisualizerSchema{}
-
 
 	//When
 	err := suite.visualizer.ConvertLtreeDataToImage(context.Background(), ltreeData)
@@ -82,4 +78,3 @@ func (suite *VisualizerTestSuite) TestConvertLtreeDataToImage_Validation_Failure
 	//Then
 	suite.NotNil(err)
 }
-

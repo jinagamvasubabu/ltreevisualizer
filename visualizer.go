@@ -1,85 +1,96 @@
-package examples
+package ltreevisualizer
 
 import (
 	"context"
-	"encoding/json"
+	"errors"
 	"fmt"
-	"github.com/stretchr/testify/suite"
-	"io/ioutil"
-	"ltreevisualizer"
-	"testing"
+	"github.com/emicklei/dot"
+	"github.com/goccy/go-graphviz"
+	log "github.com/sirupsen/logrus"
+	"strconv"
+	"strings"
+	"time"
 )
 
-type VisualizerTestSuite struct {
-	suite.Suite
-	visualizer ltreevisualizer.Visualizer
+//IVisualizer interface for to interact ltree visualizer
+type IVisualizer interface {
+	GenerateDotGraph(ctx context.Context, ltreeData VisualizerSchema) (string, error)
+	ConvertLtreeDataToImage(ctx context.Context, ltreeData VisualizerSchema) error
 }
 
-func TestNewVisualizerTestSuite(t *testing.T) {
-	tests := new(VisualizerTestSuite)
-
-	suite.Run(t, tests)
+//Visualizer config
+type Visualizer struct {
+	LogLevel log.Level
+	RankDir  string
 }
 
-func (suite *VisualizerTestSuite) SetupTest() {
-	suite.visualizer = ltreevisualizer.Visualizer{
-
+//GenerateDotGraph generates a DOT graph string
+func (v *Visualizer) GenerateDotGraph(ctx context.Context, ltreeData VisualizerSchema) (string, error) {
+	log.SetLevel(v.LogLevel)
+	logger := log.WithContext(ctx).WithFields(log.Fields{"Method": "GenerateDotGraph"})
+	defer CalculateTimeTaken(ctx, time.Now(), "Time Taken by GenerateDotGraph")
+	if err := v.validateRequest(ltreeData); err != nil {
+		logger.Debugf("Validation failed = %v", err.Error())
+		return "", err
 	}
+	//New Dot Graph instance
+	g := dot.NewGraph(dot.Directed) //Directed graph
+	if v.RankDir == "" || !Contains(GetSupportedRankDir(), v.RankDir) {
+		logger.Debugf("Setting Default Rankdir to TB")
+		v.RankDir = "TB" //Default is TB (top to bottom)
+	}
+	g.Attr("rankdir", v.RankDir)
+	//Create unique edges
+	edgeMap := map[string]dot.Edge{}
+	//create a map for names to show in the nodes
+	nodeMap := map[string]string{}
+	for _, d := range ltreeData.Data {
+		nodeMap[strconv.Itoa(int(d.ID))] = d.Name
+	}
+	for _, d := range ltreeData.Data {
+		values := strings.Split(d.Path, ".")
+		for i := 0; i+1 < len(values); i++ {
+			if _, ok := edgeMap[values[i]+"->"+values[i+1]]; !ok {
+				n1 := g.Node(nodeMap[values[i]])
+				n2 := g.Node(nodeMap[values[i+1]])
+				edgeMap[values[i]+"->"+values[i+1]] = g.Edge(n1, n2)
+			}
+		}
+	}
+	return g.String(), nil
 }
 
-//Example1: This test will generate the Dot Graph and print to the console
-func (suite *VisualizerTestSuite) TestVisualizer_Generate_Dot_Graph_String() {
-	//Given
-	ltreeData := ltreevisualizer.VisualizerSchema{}
-	data, _ := ioutil.ReadFile("data.json")
-	err := json.Unmarshal(data, &ltreeData)
-	suite.Nil(err)
-
-	//When
-	graphString, err := suite.visualizer.GenerateDotGraph(context.Background(), ltreeData)
-
-	//Then
-	suite.Nil(err)
-	fmt.Printf("%s", graphString)
-	suite.NotNil(graphString)
+//ConvertLtreeDataToImage Converts Ltree Data to an image
+func (v *Visualizer) ConvertLtreeDataToImage(ctx context.Context, ltreeData VisualizerSchema) error {
+	log.SetLevel(v.LogLevel)
+	logger := log.WithContext(ctx).WithFields(log.Fields{"Method": "ConvertLtreeDataToImage"})
+	defer CalculateTimeTaken(ctx, time.Now(), "ConvertLtreeDataToImage")
+	dotGraphStr, err := v.GenerateDotGraph(ctx, ltreeData)
+	if err != nil {
+		logger.Debugf("Error while converting graph data to image = %v", err.Error())
+		return err
+	}
+	graph, err := graphviz.ParseBytes([]byte(dotGraphStr))
+	g := graphviz.New()
+	if err := g.RenderFilename(graph, graphviz.PNG, "graph.png"); err != nil {
+		log.Fatal(err)
+		return fmt.Errorf("error while generating image")
+	}
+	return nil
 }
 
-//Example2: This test will generate an image under examples directory
-func (suite *VisualizerTestSuite) TestConvertLtreeDataToImage_Generate_Image_Success() {
-	//Given
-	ltreeData := ltreevisualizer.VisualizerSchema{}
-	data, _ := ioutil.ReadFile("data.json")
-	err := json.Unmarshal(data, &ltreeData)
-	suite.Nil(err)
-
-	//When
-	err = suite.visualizer.ConvertLtreeDataToImage(context.Background(), ltreeData)
-
-	//Then
-	suite.Nil(err)
+//validateRequest validate the request
+func (v *Visualizer) validateRequest(ltreeData VisualizerSchema) error {
+	//validations
+	if len(ltreeData.Data) == 0 {
+		return errors.New("ltreeData is missing in the request")
+	}
+	var uniqueNames []string
+	for _, e := range ltreeData.Data {
+		if Contains(uniqueNames, e.Name) {
+			return errors.New("names should be unique")
+		}
+		uniqueNames = append(uniqueNames, e.Name)
+	}
+	return nil
 }
-
-func (suite *VisualizerTestSuite) TestVisualizer_Validation_failure() {
-	//Given
-	ltreeData := ltreevisualizer.VisualizerSchema{}
-
-	//When
-	_, err := suite.visualizer.GenerateDotGraph(context.Background(), ltreeData)
-
-	//Then
-	suite.NotNil(err)
-}
-
-
-func (suite *VisualizerTestSuite) TestConvertLtreeDataToImage_Validation_Failure() {
-	//Given
-	ltreeData := ltreevisualizer.VisualizerSchema{}
-
-
-	//When
-	err := suite.visualizer.ConvertLtreeDataToImage(context.Background(), ltreeData)
-
-	//Then
-	suite.NotNil(err)
-}
-
