@@ -1,7 +1,7 @@
 # Ltree Visualizer
 A golang library to visualize postgres ltree type data using DOT language and Graphviz
 
-![alt text](https://github.com/jinagamvasubabu/LtreeVisualizer/blob/main/images/LtreeVisualizer.jpg?raw=true)
+![alt text](https://github.com/jinagamvasubabu/ltreevisualizer/blob/main/images/LtreeVisualizer.jpg?raw=true)
 
 # What is Ltree?
 
@@ -9,7 +9,7 @@ Ltree is a data type which is used to represent the hierarchical tree-like struc
 postgres DB For more info-refer this https://www.postgresql.org/docs/9.1/ltree.html
 
 Sample Hierarchy:
-![alt text](https://github.com/jinagamvasubabu/LtreeVisualizer/blob/main/examples/graph.png?raw=true)
+![alt text](https://github.com/jinagamvasubabu/ltreevisualizer/blob/main/examples/graph.png?raw=true)
 
 # why do we need this library ?
 
@@ -28,22 +28,22 @@ digraph graphname {
 }
 ```
 Using GraphViz we can visualize it like below:
-![alt text](https://github.com/jinagamvasubabu/LtreeVisualizer/blob/main/images/DotLanguageDirected.png?raw=true)
+![alt text](https://github.com/jinagamvasubabu/ltreevisualizer/blob/main/images/DotLanguageDirected.png?raw=true)
 
 ## How to use?
 * get `LtreeVisualizer`
 
 ```
-  go get github.com/jinagamvasubabu/LtreeVisualizer
+  go get github.com/jinagamvasubabu/ltreevisualizer
 ```
 
 * import and use it like below for to generate the output in DOT graph string:
 
 ```
-  import "github.com/jinagamvasubabu/LtreeVisualizer"
+  import "github.com/jinagamvasubabu/ltreevisualizer"
   import "github.com/sirupsen/logrus"
  
-  l := LtreeVisualizer.Visualizer{}
+  l := ltreevisualizer.Visualizer{}
   resp, err := l.GenerateDotGraph(context.Background(), //json data)
   fmt.Println(resp)
 ```
@@ -51,10 +51,10 @@ Using GraphViz we can visualize it like below:
 * import and use it like below for to generate the output as an image:
 
 ```
-  import "github.com/jinagamvasubabu/LtreeVisualizer"
+  import "github.com/jinagamvasubabu/ltreevisualizer"
   import "github.com/sirupsen/logrus"
  
-  l := LtreeVisualizer.Visualizer{}
+  l := ltreevisualizer.Visualizer{}
   err := l.ConvertLtreeDataToImage(context.Background(), //json data)
 ```
 
