@@ -1,8 +1,7 @@
 # Ltree Visualizer
 [![Build Status](https://circleci.com/gh/jinagamvasubabu/ltreevisualizer.svg?style=svg)](https://circleci.com/gh/jinagamvasubabu/ltreevisualizer)
 [![Go Report Card](https://goreportcard.com/badge/github.com/jinagamvasubabu/ltreevisualizer)](https://goreportcard.com/report/github.com/jinagamvasubabu/ltreevisualizer)
-[![GoDoc](https://godoc.org/github.com/jinagamvasubabu/ltreevisualizer?status.svg)](https://godoc.org/github.com/jinagamvasubabu/ltreevisualizer) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fjinagamvasubabu%2Fltreevisualizer.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fjinagamvasubabu%2Fltreevisualizer?ref=badge_shield)
-
+[![GoDoc](https://godoc.org/github.com/jinagamvasubabu/ltreevisualizer?status.svg)](https://godoc.org/github.com/jinagamvasubabu/ltreevisualizer) 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Visits Badge](https://badges.pufler.dev/visits/jinagamvasubabu/ltreevisualizer)](https://badges.pufler.dev)
 
@@ -107,7 +106,3 @@ Refer `data.json` file under examples directory for sample data
 
 # How to test?
 Refer `visualizer_test.go` for sample tests
-
-
-## License
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fjinagamvasubabu%2Fltreevisualizer.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fjinagamvasubabu%2Fltreevisualizer?ref=badge_large)
