@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Visits Badge](https://badges.pufler.dev/visits/jinagamvasubabu/ltreevisualizer)](https://badges.pufler.dev)
 
-A golang library to visualize postgres ltree type data using DOT language and Graphviz
+A golang library to visualize or display postgres ltree type data using DOT language and Graphviz
 
 ![alt text](https://github.com/jinagamvasubabu/ltreevisualizer/blob/main/images/LtreeVisualizer.jpg?raw=true)
 
