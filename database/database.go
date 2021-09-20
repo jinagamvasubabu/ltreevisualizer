@@ -15,13 +15,14 @@ type dbHelper struct {
 	PostgresURI string
 }
 
+//NewDBHelper Creates a New DB helper instance
 func NewDBHelper(postgresURI string) DbHelper {
 	return &dbHelper{
 		postgresURI,
 	}
 }
 
-//Create/Open a new DB connection
+//CreateDBConn Create/Open a new DB connection
 func (d *dbHelper) CreateDBConn() (*gorm.DB, error) {
 	conn, err := gorm.Open("postgres", d.PostgresURI)
 	if err != nil {

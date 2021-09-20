@@ -5,8 +5,9 @@ type VisualizerSchema struct {
 	Data []Data `json:"Data"`
 }
 
+//Data Visualizer data
 type Data struct {
-	Id   int32  `json:"id"`
+	ID   int32  `json:"id"`
 	Name string `json:"name"`
 	Path string `json:"path"`
 	Type string `json:"type"`

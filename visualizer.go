@@ -60,7 +60,7 @@ func (v *Visualizer) GenerateDotGraph(ctx context.Context, ltreeData VisualizerS
 	//create a map for names to show in the nodes
 	nodeMap := map[string]string{}
 	for _, d := range ltreeData.Data {
-		nodeMap[strconv.Itoa(int(d.Id))] = d.Name
+		nodeMap[strconv.Itoa(int(d.ID))] = d.Name
 	}
 	for _, d := range ltreeData.Data {
 		values := strings.Split(d.Path, ".")
@@ -106,7 +106,7 @@ func (v *Visualizer) getLtreeDataFromPostgres(ctx context.Context) (VisualizerSc
 	var data []Data
 	if err := conn.Raw(v.Query).Scan(&data).Error; err != nil {
 		logger.Error("error while fetching the ltree data from postgres", err.Error())
-		return VisualizerSchema{}, errors.New(fmt.Sprintf("error while fetching the ltree data from postgres = %s", err.Error()))
+		return VisualizerSchema{}, fmt.Errorf("error while fetching the ltree data from postgres = %s", err.Error())
 	}
 	if len(data) == 0 {
 		return VisualizerSchema{}, errors.New("no data available in postgres DB")
