@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/emicklei/dot"
 	"github.com/goccy/go-graphviz"
+	"github.com/jinagamvasubabu/ltreevisualizer/database"
 	log "github.com/sirupsen/logrus"
 	"strconv"
 	"strings"
@@ -20,8 +21,11 @@ type IVisualizer interface {
 
 //Visualizer config
 type Visualizer struct {
-	LogLevel log.Level
-	RankDir  string
+	LogLevel    log.Level
+	RankDir     string
+	PostgresURI string //Example postgresql://postgres:postgres@localhost:5432/taxonomy?sslmode=disable
+	Query       string //select id, name, path from table1 //columns specified in this example should match or use resultset alias if your column names are different
+	FetchFromDB bool
 }
 
 //GenerateDotGraph generates a DOT graph string
@@ -29,9 +33,20 @@ func (v *Visualizer) GenerateDotGraph(ctx context.Context, ltreeData VisualizerS
 	log.SetLevel(v.LogLevel)
 	logger := log.WithContext(ctx).WithFields(log.Fields{"Method": "GenerateDotGraph"})
 	defer CalculateTimeTaken(ctx, time.Now(), "Time Taken by GenerateDotGraph")
+	//Check if DB details are present in the config then convert that Data to ltreeData
+	if err := v.validateDBRequest(); err != nil {
+		return "", err
+	}
 	if err := v.validateRequest(ltreeData); err != nil {
 		logger.Debugf("Validation failed = %v", err.Error())
 		return "", err
+	}
+	if v.FetchFromDB {
+		var err error
+		ltreeData, err = v.getLtreeDataFromPostgres(ctx)
+		if err != nil {
+			return "", err
+		}
 	}
 	//New Dot Graph instance
 	g := dot.NewGraph(dot.Directed) //Directed graph
@@ -45,7 +60,7 @@ func (v *Visualizer) GenerateDotGraph(ctx context.Context, ltreeData VisualizerS
 	//create a map for names to show in the nodes
 	nodeMap := map[string]string{}
 	for _, d := range ltreeData.Data {
-		nodeMap[strconv.Itoa(int(d.ID))] = d.Name
+		nodeMap[strconv.Itoa(int(d.Id))] = d.Name
 	}
 	for _, d := range ltreeData.Data {
 		values := strings.Split(d.Path, ".")
@@ -67,7 +82,7 @@ func (v *Visualizer) ConvertLtreeDataToImage(ctx context.Context, ltreeData Visu
 	defer CalculateTimeTaken(ctx, time.Now(), "ConvertLtreeDataToImage")
 	dotGraphStr, err := v.GenerateDotGraph(ctx, ltreeData)
 	if err != nil {
-		logger.Debugf("Error while converting graph data to image = %v", err.Error())
+		logger.Debugf("Error while converting graph Data to image = %v", err.Error())
 		return err
 	}
 	graph, err := graphviz.ParseBytes([]byte(dotGraphStr))
@@ -79,9 +94,33 @@ func (v *Visualizer) ConvertLtreeDataToImage(ctx context.Context, ltreeData Visu
 	return nil
 }
 
+//getLtreeDataFromPostgres private method which helps to get the ltree data from the postgres DB
+func (v *Visualizer) getLtreeDataFromPostgres(ctx context.Context) (VisualizerSchema, error) {
+	log.SetLevel(v.LogLevel)
+	logger := log.WithContext(ctx).WithFields(log.Fields{"Method": "getLtreeDataFromPostgres"})
+	helper := database.NewDBHelper(v.PostgresURI)
+	conn, err := helper.CreateDBConn()
+	if err != nil {
+		return VisualizerSchema{}, err
+	}
+	var data []Data
+	if err := conn.Raw(v.Query).Scan(&data).Error; err != nil {
+		logger.Error("error while fetching the ltree data from postgres", err.Error())
+		return VisualizerSchema{}, errors.New(fmt.Sprintf("error while fetching the ltree data from postgres = %s", err.Error()))
+	}
+	if len(data) == 0 {
+		return VisualizerSchema{}, errors.New("no data available in postgres DB")
+	}
+	schema := VisualizerSchema{data}
+	return schema, nil
+}
+
 //validateRequest validate the request
 func (v *Visualizer) validateRequest(ltreeData VisualizerSchema) error {
 	//validations
+	if v.FetchFromDB == true {
+		return nil
+	}
 	if len(ltreeData.Data) == 0 {
 		return errors.New("ltreeData is missing in the request")
 	}
@@ -91,6 +130,21 @@ func (v *Visualizer) validateRequest(ltreeData VisualizerSchema) error {
 			return errors.New("names should be unique")
 		}
 		uniqueNames = append(uniqueNames, e.Name)
+	}
+	return nil
+}
+
+//validateDBRequest check  all necessary information provided to fetch the information from DB
+func (v *Visualizer) validateDBRequest() error {
+	//validations
+	if v.FetchFromDB == false {
+		return nil
+	}
+	if v.PostgresURI == "" {
+		return errors.New("PostgresURI is missing in the configuration")
+	}
+	if v.Query == "" {
+		return errors.New("query is missing in the configuration")
 	}
 	return nil
 }

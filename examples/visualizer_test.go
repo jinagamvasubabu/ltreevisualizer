@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/jinagamvasubabu/ltreevisualizer"
+	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/suite"
 	"io/ioutil"
 	"testing"
@@ -17,7 +18,6 @@ type VisualizerTestSuite struct {
 
 func TestNewVisualizerTestSuite(t *testing.T) {
 	tests := new(VisualizerTestSuite)
-
 	suite.Run(t, tests)
 }
 
@@ -74,6 +74,33 @@ func (suite *VisualizerTestSuite) TestConvertLtreeDataToImage_Validation_Failure
 
 	//When
 	err := suite.visualizer.ConvertLtreeDataToImage(context.Background(), ltreeData)
+
+	//Then
+	suite.NotNil(err)
+}
+
+func (suite *VisualizerTestSuite) TestGenerateDotGraph_DBPostgresURI_Missing_Failure() {
+	//Given
+	suite.visualizer = ltreevisualizer.Visualizer{
+		FetchFromDB: true,
+	}
+
+	//When
+	err := suite.visualizer.ConvertLtreeDataToImage(context.Background(), ltreevisualizer.VisualizerSchema{})
+
+	//Then
+	suite.NotNil(err)
+}
+
+func (suite *VisualizerTestSuite) TestGenerateDotGraph_DBQuery_Missing_Failure() {
+	//Given
+	suite.visualizer = ltreevisualizer.Visualizer{
+		PostgresURI: "dsfdsfsdf",
+		FetchFromDB: true,
+	}
+
+	//When
+	err := suite.visualizer.ConvertLtreeDataToImage(context.Background(), ltreevisualizer.VisualizerSchema{})
 
 	//Then
 	suite.NotNil(err)
