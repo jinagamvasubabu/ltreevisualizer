@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Visits Badge](https://badges.pufler.dev/visits/jinagamvasubabu/ltreevisualizer)](https://badges.pufler.dev)
 
-A golang library to visualize or display postgres ltree type data using DOT language and Graphviz
+A golang library to visualize or display postgres ltree type data directly from Postgres DB using DOT language and Graphviz 
 
 ![alt text](https://github.com/jinagamvasubabu/ltreevisualizer/blob/main/images/LtreeVisualizer.jpg?raw=true)
 
@@ -35,7 +35,77 @@ digraph graphname {
 ```
 ![alt text](https://github.com/jinagamvasubabu/ltreevisualizer/blob/main/images/DotLanguageDirected.png?raw=true)
 
-## How to use?
+# Config:
+```go
+//Visualizer config
+type Visualizer struct {
+    LogLevel    log.Level
+    RankDir     string
+    PostgresURI string //Example postgresql://postgres:postgres@localhost:5432/taxonomy?sslmode=disable
+    Query       string //select id, name, path from table1 //columns specified in this example should match or use resultset alias if your column names are different
+    FetchFromDB bool
+}
+```
+RankDir: Sets the direction of tree layout(https://www.graphviz.org/docs/attrs/rankdir/) and supported values are
+* TB (Top to Bottom)
+* RL (Right to Left)
+* LR (Left to Right)
+* BT (Bottom to Top)
+  Note: Default is TB
+
+FilePath: FilePath to save the image, this parameter is optional for `GenerateDotGraph`.
+Note: Default value of FilePath is `graph.png`
+
+You can generate image of your ltree data using two ways:
+* Directly fetch the data from your Postgres DB
+* using Interim JSON file
+
+## DB Way (Directly fetch the data from your Postgres DB):
+```go
+//Visualizer config
+type Visualizer struct {
+    LogLevel    log.Level
+    RankDir     string
+    PostgresURI string //Example postgresql://postgres:postgres@localhost:5432/taxonomy?sslmode=disable
+    Query       string //select id, name, path from table1 //columns specified in this example should match or use resultset alias if your column names are different
+    FetchFromDB bool
+}
+```
+1. Provide `PostgresURI` which your app can connect Eg: `postgresql://postgres:postgres@localhost:5432/taxonomy?sslmode=disable`
+2. Provide `Query` to fetch the data of your Ltree and your query result set should contain id, name, path
+3. Set `FetchFromDB` to true
+
+```go
+  import "github.com/jinagamvasubabu/ltreevisualizer"
+  import "github.com/sirupsen/logrus"
+ 
+  l := ltreevisualizer.Visualizer{
+        PostgresURI: "postgresql://postgres:postgres@localhost:5432/taxonomy?sslmode=disable",
+        Query: "select id as id, name as name,path as path from table"
+  }
+  resp, err := l.ConvertLtreeDataToImage(context.Background(), ltreevisualizer.VisualizerSchema{})
+  fmt.Println(resp)
+```
+
+## Using Interim Json File:
+If you don't want to connect to DB and fetch the results then you can follow this way by using interim JSON file
+```go
+//VisualizerSchema Contract to send to ltreevisualizer
+type VisualizerSchema struct {
+	Data []data `json:"data"`
+}
+
+type data struct {
+	ID   int32  `json:"id"`
+	Name string `json:"name"`
+	Path string `json:"path"`
+	Type string `json:"type"`
+}
+```
+
+Refer `data.json` file under examples directory for sample data
+
+
 * get `LtreeVisualizer`
 
 ```
@@ -65,44 +135,7 @@ digraph graphname {
 
 Note: This will create a graph.png image if you don't specify Filepath
 
-You can refer `examples` directory for more info 
-
-# Config:
-```go
-//Visualizer config
-type Visualizer struct {
-	LogLevel log.Level
-	RankDir  string
-	FilePath string
-}
-```
-RankDir: Sets the direction of tree layout(https://www.graphviz.org/docs/attrs/rankdir/) and supported values are
-* TB (Top to Bottom)
-* RL (Right to Left)
-* LR (Left to Right)
-* BT (Bottom to Top)
-Note: Default is TB
-
-FilePath: FilePath to save the image, this parameter is optional for `GenerateDotGraph`. 
-Note: Default value of FilePath is `graph.png`
-
-# Input:
-Ltree Visualizer accepts data in this format
-```go
-//VisualizerSchema Contract to send to ltreevisualizer
-type VisualizerSchema struct {
-	Data []data `json:"data"`
-}
-
-type data struct {
-	ID   int32  `json:"id"`
-	Name string `json:"name"`
-	Path string `json:"path"`
-	Type string `json:"type"`
-}
-```
-
-Refer `data.json` file under examples directory for sample data
+You can refer `examples` directory for more info
 
 # How to test?
 Refer `visualizer_test.go` for sample tests
